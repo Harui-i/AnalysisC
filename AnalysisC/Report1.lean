@@ -193,7 +193,7 @@ lemma iUnion_in_F : ∀ f : ℕ → Set α,
     grind
 
 -- 可測空間の型クラスのインスタンスを作る(これで(1)が解けたということになる)
-instance : MeasurableSpace α where
+instance f_measurable_space : MeasurableSpace α where
   MeasurableSet' := is_in_F
   measurableSet_empty := empty_set_in_F
   measurableSet_compl := compl_in_F
@@ -251,7 +251,41 @@ def finsubs_of_f : (Set (Set α )) := {A | A.Finite }
 
 def generated_measurable : Set α → Prop := MeasurableSpace.GenerateMeasurable finsubs_of_f
 
-def generated_measurableSpace : MeasurableSpace α := MeasurableSpace.generateFrom finsubs_of_f
+
+-- この形式化であってる？
+theorem problem_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
+  rw [f_measurable_space, MeasurableSpace.generateFrom]
+  simp_all only [MeasurableSpace.mk.injEq]
+  --⊢ MeasurableSpace.GenerateMeasurable finsubs_of_f = is_in_F
+  ext x
+  -- extは外延性を使うtactic
+  -- 外延性とは、同じものから作られているものは同じ　という主張
+  constructor <;> intro h
+  · --
+    rw [is_in_F]
+    rw [finsubs_of_f] at h
+    left
+    -- x: Set α
+    -- h: MeasurableSpace.GenerateMeasurable {A | A.Finite} x
+    -- ⊢ x.Countable
+    -- なんか MeasurableSpace.GenerateMeasurableが帰納型であることを利用すればうまく証明できるんじゃね
+    -- 帰納法とかmatchできないすか
+
+    sorry
+  · --
+    -- h: is_in_F x
+    -- MeasurableSpace.GenerateMeasurable finsubs_of_f x
+    rw [is_in_F] at h
+    rw [finsubs_of_f]
+    -- h: x.Countable ∨ xᶜ.Countable
+    -- ⊢ MeasurableSpace.GenerateMeasurable {A | A.Finite} x
+    cases h with
+    | inl h1 =>
+      -- h1: x.Countable
+      sorry
+    | inr h2 =>
+      -- h2: xᶜ.Countable
+      sorry
 
 
 end
