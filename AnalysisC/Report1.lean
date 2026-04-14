@@ -1,6 +1,7 @@
 import Mathlib.Data.Set.Basic
 import Mathlib.Data.Set.Countable
-import Mathlib.MeasureTheory.MeasurableSpace.Defs
+import Mathlib.MeasureTheory.MeasurableSpace.Defs --可測空間の定義など
+import Mathlib.MeasureTheory.SetAlgebra --有限加法族
 
 /--
 解析学C レポート問題No.1
@@ -115,16 +116,6 @@ theorem my_theorem : 1+1 = 2 := by simp
 
 variable {α : Type*}
 
-/-
-通る
-def F : Set (Set α) :=
-  {A | A.Countable ∨ Aᶜ.Countable}
-
-通る
-def F : Set (Set S) :=
-  { A | A.Countable  ∨ Aᶜ.Countable }
--/
-
 -- (1) FがSを全体集合とするσ-加法族であることを示す。
 -- Mathlibの定義にあるクラスの項を構成することで示したことにする。
 -- instanceを使えば作れるっぽい。
@@ -209,5 +200,58 @@ instance : MeasurableSpace α where
   measurableSet_iUnion := iUnion_in_F
 
 -- (2) FはSの有限部分集合全体が生成するσ-加法族であることを示しなさい。
+/-
+生成するσ-加法族ってMathlibでどう定義されてるんだ
+inductive generateSetAlgebra {α : Type*} (𝒜 : Set (Set α)) : Set (Set α)
+  | base (s : Set α) (s_mem : s ∈ 𝒜) : generateSetAlgebra 𝒜 s
+  | empty : generateSetAlgebra 𝒜 ∅
+  | compl (s : Set α) (hs : generateSetAlgebra 𝒜 s) : generateSetAlgebra 𝒜 sᶜ
+  | union (s t : Set α) (hs : generateSetAlgebra 𝒜 s) (ht : generateSetAlgebra 𝒜 t) :
+      generateSetAlgebra 𝒜 (s ∪ t)
+
+これか？　なんか違う気がするんだけど
+これ有限加法族やん！！！！！
+σ-加法族は有限加法族だけど、有限加法族はσ-加法族とは限らない。
+だから、「FはSの有限部分集合全体が生成する有限加法族である」が示せるならこの定義を使っても示せるけど、無理ならむり。
+
+というかNatの定義も自然数を定義してる感じしなかったし、帰納型がそもそも直感的じゃないのかも。
+↓これが自然数なの！？って感じだろ.
+
+inductive MyNat where
+| zero
+| succ (n : MyNat)
+
+Mathlibのσ-加法族関連は、可測空間として定義されてるって感じかな？↓は生成するσ加法族っぽいかも
+
+/-- Construct the smallest measure space containing a collection of basic sets -/
+@[implicit_reducible]
+def generateFrom (s : Set (Set α)) : MeasurableSpace α where
+  MeasurableSet' := GenerateMeasurable s
+  measurableSet_empty := .empty
+  measurableSet_compl := .compl
+  measurableSet_iUnion := .iUnion
+
+/-- The smallest σ-algebra containing a collection `s` of basic sets -/
+inductive GenerateMeasurable (s : Set (Set α)) : Set α → Prop
+  | protected basic : ∀ u ∈ s, GenerateMeasurable s u
+  | protected empty : GenerateMeasurable s ∅
+  | protected compl : ∀ t, GenerateMeasurable s t → GenerateMeasurable s tᶜ
+  | protected iUnion : ∀ f : ℕ → Set α, (∀ n, GenerateMeasurable s (f n)) →
+      GenerateMeasurable s (⋃ i, f i)
+-/
+-- (2) FはSの有限部分集合全体が生成するσ-加法族であることを示しなさい。
+
+def finsubs_of_f : (Set (Set α )) := {A | A.Finite }
+
+-- Definition `generated_measurablespace` of class type must be marked with `@[reducible]` or
+-- `@[implicit_reducible]`
+-- とのこと。よくわからんけど!
+--@[reducible]
+--def generated_measurablespace := @MeasurableSpace.generateFrom α finsubs_of_f
+
+def generated_measurable : Set α → Prop := MeasurableSpace.GenerateMeasurable finsubs_of_f
+
+def generated_measurableSpace : MeasurableSpace α := MeasurableSpace.generateFrom finsubs_of_f
+
 
 end
