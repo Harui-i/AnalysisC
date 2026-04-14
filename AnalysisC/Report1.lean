@@ -30,7 +30,7 @@ lemma ezlemma : 1+1=2 := by
 
 section
 
-/- ## 参考文献など
+/- ## 参考文献など myrefs
 
 Mathlib doc: Measurable spaces and measurable functions:
 https://leanprover-community.github.io/mathlib4_docs/Mathlib/MeasureTheory/SetAlgebra.html#MeasureTheory.IsSetAlgebra
@@ -129,21 +129,21 @@ def F : Set (Set S) :=
 -- Mathlibの定義にあるクラスの項を構成することで示したことにする。
 -- instanceを使えば作れるっぽい。
 
-def is_measurable (A : Set α) := A.Countable ∨ Aᶜ.Countable
+def is_in_F (A : Set α) := A.Countable ∨ Aᶜ.Countable
 
-lemma empty_set_is_measurable : is_measurable (∅: Set α) := by
-  rw [is_measurable]
+lemma empty_set_in_F : is_in_F (∅: Set α) := by
+  rw [is_in_F]
   left
   -- ⊢ : ∅.Countable
   simp
 
 -- ∀ s, MeasurableSet' s → MeasurableSet' sᶜ
-lemma compl_measurable : ∀ s: Set α, is_measurable s → is_measurable sᶜ  :=  by
+lemma compl_in_F : ∀ s: Set α, is_in_F s → is_in_F sᶜ  :=  by
   -- ⊢ : ∀ (s : Set α), is_measurable s → is_measurable sᶜ
   intro s hs
   -- hs : is_measurable s
   -- ⊢ is_measurable sᶜ
-  rw [is_measurable] at *
+  rw [is_in_F] at *
   -- hs : s.Countable ∨ sᶜ.Countable
   -- ⊢: sᶜ.Countable ∨ sᶜᶜ.Countable
   rcases hs with hsl | hsr
@@ -158,13 +158,13 @@ lemma compl_measurable : ∀ s: Set α, is_measurable s → is_measurable sᶜ  
     exact hsr
 
 
-lemma iUnion_measurable : ∀ f : ℕ → Set α,
- (∀ i, is_measurable (f i)) → is_measurable (⋃i, f i) := by
+lemma iUnion_in_F : ∀ f : ℕ → Set α,
+ (∀ i, is_in_F (f i)) → is_in_F (⋃i, f i) := by
   intro f h_all_i
   -- f: ℕ → Set α
   -- h_all_i:  ∀ i, is_measurable (f i)
   -- ⊢ is_measurable(⋃ i, f i)
-  simp_all only [is_measurable] -- 定義を展開ざむらい
+  simp_all only [is_in_F] -- 定義を展開ざむらい
   -- h_all_i : ∀ i, (f i).Countable ∨ (f i)ᶜ.Countable
   -- ⊢ (⋃ i, f i).Countable ∨ (⋃ i, f i)ᶜ.Countable
   by_cases hAll_countable: ∀ n, (f n).Countable
@@ -201,15 +201,13 @@ lemma iUnion_measurable : ∀ f : ℕ → Set α,
       exact Set.Countable.mono h1 hi
     grind
 
-
-
-
-
 -- 可測空間の型クラスのインスタンスを作る(これで(1)が解けたということになる)
 instance : MeasurableSpace α where
-  MeasurableSet' := is_measurable
-  measurableSet_empty := empty_set_is_measurable
-  measurableSet_compl := compl_measurable
-  measurableSet_iUnion := iUnion_measurable
+  MeasurableSet' := is_in_F
+  measurableSet_empty := empty_set_in_F
+  measurableSet_compl := compl_in_F
+  measurableSet_iUnion := iUnion_in_F
+
+-- (2) FはSの有限部分集合全体が生成するσ-加法族であることを示しなさい。
 
 end
