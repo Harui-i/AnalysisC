@@ -249,10 +249,23 @@ def finsubs_of_f : (Set (Set α )) := {A | A.Finite }
 --@[reducible]
 --def generated_measurablespace := @MeasurableSpace.generateFrom α finsubs_of_f
 
-def generated_measurable : Set α → Prop := MeasurableSpace.GenerateMeasurable finsubs_of_f
+@[implicit_reducible]
+def generated_measurable : MeasurableSpace α := MeasurableSpace.generateFrom  finsubs_of_f
+
 
 
 -- この形式化であってる？
+-- (2) FはSの有限部分集合全体が生成するσ-加法族であることを示しなさい。
+-- つまりσ加法族の一致を示さなきゃいけないけど、どういう定義になってるんだ
+--
+
+-- ≤ のimplicit argument αに、αを渡すために@を使う
+lemma problem_2_l1 : generated_measurable ≤ @f_measurable_space α  := by
+  sorry
+lemma problem_2_l2 : @f_measurable_space α ≤ generated_measurable := by
+  sorry
+
+
 theorem problem_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
   rw [f_measurable_space, MeasurableSpace.generateFrom]
   simp_all only [MeasurableSpace.mk.injEq]
