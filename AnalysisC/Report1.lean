@@ -261,8 +261,31 @@ def generated_measurable : MeasurableSpace α := MeasurableSpace.generateFrom  f
 
 -- ≤ のimplicit argument αに、αを渡すために@を使う
 lemma problem_2_l1 : generated_measurable ≤ @f_measurable_space α  := by
-  sorry
+  /-
+  theorem generateFrom_le_iff {s : Set (Set α)} (m : MeasurableSpace α) :
+    generateFrom s ≤ m ↔ s ⊆ { t | MeasurableSet[m] t } :=
+    Iff.intro (fun h _ hu => h _ <| measurableSet_generateFrom hu) fun h => generateFrom_le h
+  -/
+
+  -- generateFrom_le_iffを使う
+  simp only [generated_measurable, MeasurableSpace.generateFrom_le_iff]
+  intro s hs
+  simp only [MeasurableSet] at *
+  simp only [f_measurable_space, is_in_F, finsubs_of_f] at *
+  -- hs: s ∈ {A | A.Finite}
+  -- ⊢ s ∈ {t | t.Countable ∨ tᶜ.Countable}
+  left
+  -- ⊢ s.Countable
+  -- theorem mem_setOf {a : α} {p : α → Prop} : a ∈ { x | p x } ↔ p a := Iff.rfl
+  -- ↔ を→にするために.1を使う
+  have hs2 : s.Finite := Set.mem_setOf.1 hs
+  -- s.Finite → s.Countableは自明だろ　さすがに定理あるはず
+  exact Set.Finite.countable hs2
+
 lemma problem_2_l2 : @f_measurable_space α ≤ generated_measurable := by
+  intro s hs
+  simp [MeasurableSet] at *
+  simp [generated_measurable, f_measurable_space, is_in_F, finsubs_of_f] at *
   sorry
 
 
