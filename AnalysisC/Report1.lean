@@ -262,12 +262,10 @@ def generated_measurable : MeasurableSpace α := MeasurableSpace.generateFrom  f
 -- ≤ のimplicit argument αに、αを渡すために@を使う
 lemma problem_2_l1 : generated_measurable ≤ @f_measurable_space α  := by
   /-
+  -- generateFrom_le_iffを使う
   theorem generateFrom_le_iff {s : Set (Set α)} (m : MeasurableSpace α) :
     generateFrom s ≤ m ↔ s ⊆ { t | MeasurableSet[m] t } :=
-    Iff.intro (fun h _ hu => h _ <| measurableSet_generateFrom hu) fun h => generateFrom_le h
   -/
-
-  -- generateFrom_le_iffを使う
   simp only [generated_measurable, MeasurableSpace.generateFrom_le_iff]
   intro s hs
   simp only [MeasurableSet] at *
@@ -280,13 +278,30 @@ lemma problem_2_l1 : generated_measurable ≤ @f_measurable_space α  := by
   -- ↔ を→にするために.1を使う
   have hs2 : s.Finite := Set.mem_setOf.1 hs
   -- s.Finite → s.Countableは自明だろ　さすがに定理あるはず
+  -- →ありました。なんでsimp_all?で出てこないんだろ
   exact Set.Finite.countable hs2
 
+
+-- FはSの有限部分集合全体が生成するσ-加法族に含まれている
 lemma problem_2_l2 : @f_measurable_space α ≤ generated_measurable := by
+  simp only [generated_measurable]
   intro s hs
-  simp [MeasurableSet] at *
-  simp [generated_measurable, f_measurable_space, is_in_F, finsubs_of_f] at *
-  sorry
+  simp only [MeasurableSet] at *
+  simp only [f_measurable_space, is_in_F, finsubs_of_f] at *
+  constructor
+  simp only [Set.mem_setOf]
+  -- ⊢ s.Finite
+  rcases hs with hs1 | hs2
+  ·
+    -- hs1: s.Countable
+    -- s: Set α 
+    -- ⊢ s.Finite
+    -- まじ？こんなことある？
+
+    sorry
+  ·
+    -- hs2: sᶜ.Ccountable
+    sorry
 
 
 theorem problem_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
