@@ -260,7 +260,7 @@ def generated_measurable : MeasurableSpace α := MeasurableSpace.generateFrom  f
 --
 
 -- ≤ のimplicit argument αに、αを渡すために@を使う
-lemma problem_2_l1 : generated_measurable ≤ @f_measurable_space α  := by
+lemma problem_1_2_l1 : generated_measurable ≤ @f_measurable_space α  := by
   /-
   -- generateFrom_le_iffを使う
   theorem generateFrom_le_iff {s : Set (Set α)} (m : MeasurableSpace α) :
@@ -325,7 +325,7 @@ lemma countable_generated_by_finsubs {s : Set α} (hs : s.Countable) :
 
 -- FはSの有限部分集合全体が生成するσ-加法族に含まれている
 -- F ⊆ Sの有限部分集合(以下略)
-lemma problem_2_l2 : @f_measurable_space α ≤ generated_measurable := by
+lemma problem_1_2_l2 : @f_measurable_space α ≤ generated_measurable := by
   simp only [generated_measurable]
   intro s hs
   simp only [MeasurableSet] at *
@@ -356,8 +356,8 @@ inductive GenerateMeasurable (s : Set (Set α)) : Set α → Prop
     exact hsc_generated_compl
 
 
-theorem problem_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
-  exact le_antisymm problem_2_l1 problem_2_l2
+theorem problem_1_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
+  exact le_antisymm problem_1_2_l1 problem_1_2_l2
 
 
 end
