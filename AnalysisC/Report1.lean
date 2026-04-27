@@ -287,21 +287,53 @@ lemma problem_2_l2 : @f_measurable_space α ≤ generated_measurable := by
   simp only [generated_measurable]
   intro s hs
   simp only [MeasurableSet] at *
-  simp only [f_measurable_space, is_in_F, finsubs_of_f] at *
-  constructor
-  simp only [Set.mem_setOf]
-  -- ⊢ s.Finite
-  rcases hs with hs1 | hs2
-  ·
-    -- hs1: s.Countable
-    -- s: Set α 
-    -- ⊢ s.Finite
-    -- まじ？こんなことある？
+  simp only [f_measurable_space, is_in_F] at *
+  -- hs: s.Countable ∨ sᶜ.Countable
+  -- ⊢ MeasurableSpace.GenerateMeasurable {A | A.Finite} s
+  -- GenerateMeasurableの定義:
+  /-
+  /-- The smallest σ-algebra containing a collection `s` of basic sets -/
+inductive GenerateMeasurable (s : Set (Set α)) : Set α → Prop
+  | protected basic : ∀ u ∈ s, GenerateMeasurable s u
+  | protected empty : GenerateMeasurable s ∅
+  | protected compl : ∀ t, GenerateMeasurable s t → GenerateMeasurable s tᶜ
+  | protected iUnion : ∀ f : ℕ → Set α, (∀ n, GenerateMeasurable s (f n)) →
+      GenerateMeasurable s (⋃ i, f i)
+  -/
+  rcases hs with hs_countable | hsc_countable
+  · -- hs_countable : s.Countable
+    -- ここで「可算集合は有限集合全体が生成するσ加法族に入る」を示す。
+    rw [MeasurableSpace.generateFrom ]
 
-    sorry
-  ·
-    -- hs2: sᶜ.Ccountable
-    sorry
+    have h_enum :
+      ∃ f : ℕ → Set α,
+        (∀ n, MeasurableSpace.GenerateMeasurable finsubs_of_f (f n)) ∧
+        s = ⋃ n, f n := by
+      sorry
+
+    obtain ⟨f, hf⟩ := h_enum 
+
+    have h_iUnion : MeasurableSpace.GenerateMeasurable finsubs_of_f (⋃ n, f n) := by
+      sorry
+
+    rw [hf.right]
+    -- ⊢ MeasurableSpace.MeasurableSet' { MeasurableSet' := ..., measurableSet_iUnion :=...}
+    -- このうち、f: ∀ ℕ → Set αと (∀ n, GenerateMeasurable s (f n)) → GenerateMeasurable s (⋃ i, f i))のふたつを
+    -- わたせばいいコンストラクタであるiUnionコンストラクタを使う
+    exact h_iUnion
+  · -- hsc_countable : sᶜ.Countable
+    have hsc_generated : MeasurableSpace.GenerateMeasurable {A | A.Finite} sᶜ := by
+      -- 上のケースと同じ補題を sᶜ に適用する場所。
+      sorry
+
+    have hsc_generated_compl: MeasurableSpace.GenerateMeasurable {A | A.Finite} (sᶜ)ᶜ := 
+      MeasurableSpace.GenerateMeasurable.compl sᶜ hsc_generated
+
+    have s_compl_compl: (sᶜ)ᶜ = s := by simp 
+
+    rw [s_compl_compl] at hsc_generated_compl
+    simp only [finsubs_of_f]
+    exact hsc_generated_compl
 
 
 theorem problem_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
