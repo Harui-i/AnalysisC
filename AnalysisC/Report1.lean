@@ -282,7 +282,49 @@ lemma problem_2_l1 : generated_measurable ≤ @f_measurable_space α  := by
   exact Set.Finite.countable hs2
 
 
+-- sが可算集合なら、finsubs_of_fが生成するσ加法族の、measurable setである
+-- sは可算集合なので、{s_1,s_2,s_3, ....} = sと表せる。
+-- {s_1}, {s_2}, ...., はfinsubs_of_fの元。なのでgeneratemeasurableのmeasurableset.
+-- measurable setのiUnionもmeasurable set.
+lemma countable_generated_by_finsubs {s : Set α} (hs : s.Countable) :
+    MeasurableSpace.GenerateMeasurable finsubs_of_f s := by
+  -- s: Set α
+  -- hs: s.Countable
+  -- ⊢ MeasurableSpace.GenerateMeasurable finsubs_of_f s
+  by_cases h_semp: s.Nonempty 
+  case pos =>
+    obtain ⟨f, hf⟩ :=   Set.Countable.exists_eq_range hs h_semp
+    have hf2 : Set.range f = ⋃ i, ({f i} : Set α) := by
+      rw [Set.range_eq_iUnion]
+    have hf3: s = ⋃ i, {f i} := by
+      calc
+      _ = Set.range f := hf
+      _ = ⋃ i, {f i} := hf2
+    rw [hf3]
+    -- ⊢ MeasurableSpace.GenerateMeasurable finsubs_of_f (⋃ i, {f i})
+    apply MeasurableSpace.GenerateMeasurable.iUnion
+    -- ↑iUnionコンストラクタを使うことにする
+    -- ⊢ ∀ (n : ℕ ), MeasurableSpace.GenerateMeasurable
+    intro n
+    apply MeasurableSpace.GenerateMeasurable.basic
+    -- ⊢ {f n} ∈ finsubs_of_f
+    simp [finsubs_of_f ]
+  case neg =>
+    -- ⊢ MeasurableSpace.GenerateMeasurable finsubs_of_f s
+    rcases s.eq_empty_or_nonempty with h1 | h2
+    · -- h1: s = ∅
+      simp only [finsubs_of_f]
+      have h2: s.Finite := by
+        rw [h1]
+        exact Set.finite_empty
+      rw [h1]
+      exact MeasurableSpace.GenerateMeasurable.empty
+    · -- h2: s.Noempty
+      -- h_semp: ¬s.Nonempty
+      contradiction
+
 -- FはSの有限部分集合全体が生成するσ-加法族に含まれている
+-- F ⊆ Sの有限部分集合(以下略)
 lemma problem_2_l2 : @f_measurable_space α ≤ generated_measurable := by
   simp only [generated_measurable]
   intro s hs
@@ -302,73 +344,20 @@ inductive GenerateMeasurable (s : Set (Set α)) : Set α → Prop
   -/
   rcases hs with hs_countable | hsc_countable
   · -- hs_countable : s.Countable
-    -- ここで「可算集合は有限集合全体が生成するσ加法族に入る」を示す。
-    rw [MeasurableSpace.generateFrom ]
-
-    have h_enum :
-      ∃ f : ℕ → Set α,
-        (∀ n, MeasurableSpace.GenerateMeasurable finsubs_of_f (f n)) ∧
-        s = ⋃ n, f n := by
-      sorry
-
-    obtain ⟨f, hf⟩ := h_enum 
-
-    have h_iUnion : MeasurableSpace.GenerateMeasurable finsubs_of_f (⋃ n, f n) := by
-      sorry
-
-    rw [hf.right]
-    -- ⊢ MeasurableSpace.MeasurableSet' { MeasurableSet' := ..., measurableSet_iUnion :=...}
-    -- このうち、f: ∀ ℕ → Set αと (∀ n, GenerateMeasurable s (f n)) → GenerateMeasurable s (⋃ i, f i))のふたつを
-    -- わたせばいいコンストラクタであるiUnionコンストラクタを使う
-    exact h_iUnion
+    exact countable_generated_by_finsubs hs_countable
   · -- hsc_countable : sᶜ.Countable
-    have hsc_generated : MeasurableSpace.GenerateMeasurable {A | A.Finite} sᶜ := by
-      -- 上のケースと同じ補題を sᶜ に適用する場所。
-      sorry
-
+    have hsc_generated : MeasurableSpace.GenerateMeasurable finsubs_of_f sᶜ :=
+      countable_generated_by_finsubs hsc_countable
     have hsc_generated_compl: MeasurableSpace.GenerateMeasurable {A | A.Finite} (sᶜ)ᶜ := 
       MeasurableSpace.GenerateMeasurable.compl sᶜ hsc_generated
-
     have s_compl_compl: (sᶜ)ᶜ = s := by simp 
-
     rw [s_compl_compl] at hsc_generated_compl
     simp only [finsubs_of_f]
     exact hsc_generated_compl
 
 
 theorem problem_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
-  rw [f_measurable_space, MeasurableSpace.generateFrom]
-  simp_all only [MeasurableSpace.mk.injEq]
-  --⊢ MeasurableSpace.GenerateMeasurable finsubs_of_f = is_in_F
-  ext x
-  -- extは外延性を使うtactic
-  -- 外延性とは、同じものから作られているものは同じ　という主張
-  constructor <;> intro h
-  · --
-    rw [is_in_F]
-    rw [finsubs_of_f] at h
-    left
-    -- x: Set α
-    -- h: MeasurableSpace.GenerateMeasurable {A | A.Finite} x
-    -- ⊢ x.Countable
-    -- なんか MeasurableSpace.GenerateMeasurableが帰納型であることを利用すればうまく証明できるんじゃね
-    -- 帰納法とかmatchできないすか
-
-    sorry
-  · --
-    -- h: is_in_F x
-    -- MeasurableSpace.GenerateMeasurable finsubs_of_f x
-    rw [is_in_F] at h
-    rw [finsubs_of_f]
-    -- h: x.Countable ∨ xᶜ.Countable
-    -- ⊢ MeasurableSpace.GenerateMeasurable {A | A.Finite} x
-    cases h with
-    | inl h1 =>
-      -- h1: x.Countable
-      sorry
-    | inr h2 =>
-      -- h2: xᶜ.Countable
-      sorry
+  exact le_antisymm problem_2_l1 problem_2_l2
 
 
 end
