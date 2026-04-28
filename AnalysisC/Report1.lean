@@ -1,7 +1,10 @@
 import Mathlib.Data.Set.Basic
 import Mathlib.Data.Set.Countable
+import Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.MeasureTheory.MeasurableSpace.Defs --可測空間の定義など
 import Mathlib.MeasureTheory.SetAlgebra --有限加法族
+
+open scoped MeasureTheory
 
 /--
 解析学C レポート問題No.1
@@ -13,17 +16,6 @@ F = {A ∈ 2^S | AまたはAᶜ は可算集合である}
 (1) FがSを全体集合とするσ-加法族であることを示しなさい
 
 (2) FはSの有限部分集合全体が生成するσ-加法族であることを示しなさい。
-
-問2
-(1)FはSを全体集合とする σ-加法族とする。S'をSの部分集合とする
-S' ∩ F := {S' ∩ A | A ∈ F} はS'を全体集合とするσ-加法族であることを示しなさい。
-
-(2) S, S'を集合とし、F'をS'を全体集合とするσ-加法族とする。
-写像T: S → S'に対し
-T^-1(F') := {T^-1(A') | A' ∈ F }はSを全体集合とするσ-加法族であることを示しなさい
-
-(3) 全体集合Sを固定する. A ∈ 2^S に対しσ[{A}] = {∅ , A, Aᶜ, S}が成り立つことを示しなさい.
-ただしAᶜはSを全体集合とするAの補集合を表す.
 -/
 -- これがないとexpected lemmaで怒られてダルいので置く。本質的意味はない
 lemma ezlemma : 1+1=2 := by
@@ -359,5 +351,194 @@ inductive GenerateMeasurable (s : Set (Set α)) : Set α → Prop
 theorem problem_1_2 : @MeasurableSpace.generateFrom α finsubs_of_f = f_measurable_space := by
   exact le_antisymm problem_1_2_l1 problem_1_2_l2
 
+/-
+問2
+(1)FはSを全体集合とする σ-加法族とする。S'をSの部分集合とする
+S' ∩ F := {S' ∩ A | A ∈ F} はS'を全体集合とするσ-加法族であることを示しなさい。
 
+(2) S, S'を集合とし、F'をS'を全体集合とするσ-加法族とする。
+写像T: S → S'に対し
+T^-1(F') := {T^-1(A') | A' ∈ F }はSを全体集合とするσ-加法族であることを示しなさい
+
+(3) 全体集合Sを固定する. A ∈ 2^S に対しσ[{A}] = {∅ , A, Aᶜ, S}が成り立つことを示しなさい.
+ただしAᶜはSを全体集合とするAの補集合を表す.
+-/
+
+variable {α : Type*}
+variable (F : MeasurableSpace α)
+variable (S' : Set α)
+
+theorem problem_2_1 :
+      ∃ F' : MeasurableSpace S',
+        ∀ B : Set S',
+          F'.MeasurableSet' B ↔
+            ∃ A : Set α, F.MeasurableSet' A ∧
+              Subtype.val ⁻¹' A = B := by
+  refine ⟨MeasurableSpace.comap Subtype.val F, ?_⟩
+  intro B
+  constructor <;> intro hB
+  · assumption
+  · assumption
+
+theorem problem_2_2 {β : Type*} (F' : MeasurableSpace β) (T : α → β) :
+      ∃ F : MeasurableSpace α,
+        ∀ A : Set α,
+          F.MeasurableSet' A ↔
+            ∃ A' : Set β, F'.MeasurableSet' A' ∧
+              T ⁻¹' A' = A := by
+  -- https://lean-ja.github.io/lean-by-example/Tactic/Refine.html
+  refine ⟨MeasurableSpace.comap T F', ?_⟩
+  intro A
+  constructor <;> intro hA
+  · assumption
+  · assumption
+
+theorem problem_2_3 (A : Set α) :
+      ∀ B : Set α,
+        (MeasurableSpace.generateFrom ({A} : Set (Set α))).MeasurableSet' B ↔
+          B = ∅ ∨ B = A ∨ B = Aᶜ ∨ B = Set.univ := by
+  intro B
+  constructor
+  · intro hB
+    -- hB: MeasurableSpace.MeasurableSet'
+    induction hB with
+    | basic u hu =>
+      simp only [←Set.mem_singleton_iff]
+      right
+      left
+      exact hu
+    | empty =>
+      left
+      rfl
+    | compl t ht ih =>
+      rcases ih with h1 | h2 | h3 | h4
+      · right; right; right
+        -- ⊢ tᶜ = Set.univ
+        rw [h1]
+        simp
+      · right; right; left;
+        rw [h2]
+      · right; left
+        rw [h3]
+        simp
+      · left
+        rw [h4]
+        simp
+    | iUnion f hf ih =>
+      by_cases hU : ∃ n, f n = Set.univ
+      case pos =>
+        obtain ⟨n, hn⟩ := hU 
+        right; right; right;
+        -- ⊢ ⋃ i, f i = Set.univ
+        ext x
+        constructor
+        · intro hx
+          trivial
+        · intro hx
+          simp only [Set.mem_iUnion]
+          use n
+          simp [hn]
+      case neg =>
+        -- hU: ¬ ∃ n, f n = Set.univ
+        by_cases hA : ∃ n, f n = A
+        case pos =>
+          obtain ⟨n, hn⟩ := hA 
+          by_cases hA_compl : ∃ n, f n = Aᶜ
+          case pos =>
+            obtain ⟨n2, hn2⟩ := hA_compl 
+            right; right; right;
+            ext x
+            constructor <;> intro hx
+            · trivial
+            · simp_all only [Set.mem_iUnion]
+              --
+              by_cases hx2 : x ∈ A
+              case pos =>
+                use n
+                simp [hn, hx2]
+              case neg =>
+                use n2
+                simp [hn2, hx2]
+          case neg =>
+            -- hU: ¬∃ n, f n = Set.univ
+            -- hn : f n = A
+            -- hA_compl ¬ ∃ n, f n = Aᶜ
+            -- complもないしUnivもないのでA
+            right; left
+            ext x
+            simp [Set.mem_iUnion]
+            constructor <;> intro hx
+            · obtain ⟨i, hi⟩ := hx
+              have ihi : f i = ∅ ∨ f i = A ∨ f i = Aᶜ ∨ f i = Set.univ := ih i
+              rcases ihi with ihi1 | ihi2 | ihi3 | ihi4
+              · simp [ihi1] at hi
+              · simp [← ihi2]
+                simp [hi]
+              · simp [ihi3] at hi
+                -- hi: x∉ A
+                -- \goal x ∈ A
+                simp_all only [not_exists]
+              · simp_all only [not_exists]
+            · use n
+              simp [hn, hx]
+        case neg =>
+          push Not at hU hA
+          by_cases hA_compl : ∃ n, f n = Aᶜ 
+          case pos =>
+            obtain ⟨n, hn⟩ := hA_compl
+            right;right;left
+            -- ⊢ ⋃ i, f i = Aᶜ
+            ext x
+            simp only [Set.mem_iUnion]
+            constructor <;> intro hx
+              -- hU, hAから f n は Aᶜかempty
+              -- hA_complやhnから Aᶜにある
+            · obtain ⟨n2, hn2⟩ := hx 
+              have hn3 : f n2 = ∅ ∨ f n2 = A ∨ f n2 = Aᶜ ∨ f n2 = Set.univ :=  ih n2
+              rcases hn3 with hn31 | hn32 | hn33 | hn34 
+              · simp_all
+              · simp_all
+              · simp_all
+              · simp_all
+            · use n
+              rw [hn]
+              simp [hx]
+          case neg =>
+            left
+            -- ⊢ ⋃ i, f i = ∅ 
+            ext x
+            simp [Set.mem_iUnion]
+            intro i hi
+            have ihi : f i = ∅ ∨ f i = A ∨ f i = Aᶜ ∨ f i = Set.univ := ih i
+            rcases ihi with ihi1 | ihi2 | ihi3 | ihi4
+            · simp [ihi1] at hi
+            · have hAi : f i ≠ A := hA i
+              contradiction
+            · simp [ihi3] at hi
+              -- hi: x∉ A
+              -- \goal x ∈ A
+              simp_all only [not_exists]
+            · simp_all only [not_exists]
+
+
+
+  · intro hB
+    rcases hB with h1 | h2 | h3 | h4
+    · rw [h1]
+      simp only [MeasurableSpace.generateFrom ]
+      exact MeasurableSpace.GenerateMeasurable.empty
+    · rw [h2]
+      apply MeasurableSpace.GenerateMeasurable.basic
+      simp [Set.mem_singleton_iff]
+    · rw [h3]
+      apply MeasurableSpace.GenerateMeasurable.compl
+      apply MeasurableSpace.GenerateMeasurable.basic
+      simp [Set.mem_singleton_iff]
+    · rw [h4]
+      have h_univ : Set.univ = ((∅ : Set α)ᶜ) := by
+        simp
+
+      rw [h_univ]
+      apply MeasurableSpace.GenerateMeasurable.compl
+      exact MeasurableSpace.GenerateMeasurable.empty
 end
