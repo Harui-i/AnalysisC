@@ -466,7 +466,7 @@ theorem problem_2_3 (A : Set α) :
             -- complもないしUnivもないのでA
             right; left
             ext x
-            simp [Set.mem_iUnion]
+            simp only [Set.mem_iUnion]
             constructor <;> intro hx
             · obtain ⟨i, hi⟩ := hx
               have ihi : f i = ∅ ∨ f i = A ∨ f i = Aᶜ ∨ f i = Set.univ := ih i
@@ -507,7 +507,7 @@ theorem problem_2_3 (A : Set α) :
             left
             -- ⊢ ⋃ i, f i = ∅ 
             ext x
-            simp [Set.mem_iUnion]
+            simp only [Set.mem_iUnion, Set.mem_empty_iff_false, iff_false, not_exists]
             intro i hi
             have ihi : f i = ∅ ∨ f i = A ∨ f i = Aᶜ ∨ f i = Set.univ := ih i
             rcases ihi with ihi1 | ihi2 | ihi3 | ihi4
@@ -519,9 +519,6 @@ theorem problem_2_3 (A : Set α) :
               -- \goal x ∈ A
               simp_all only [not_exists]
             · simp_all only [not_exists]
-
-
-
   · intro hB
     rcases hB with h1 | h2 | h3 | h4
     · rw [h1]
@@ -537,7 +534,6 @@ theorem problem_2_3 (A : Set α) :
     · rw [h4]
       have h_univ : Set.univ = ((∅ : Set α)ᶜ) := by
         simp
-
       rw [h_univ]
       apply MeasurableSpace.GenerateMeasurable.compl
       exact MeasurableSpace.GenerateMeasurable.empty
