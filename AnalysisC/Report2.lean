@@ -83,21 +83,25 @@ theorem symmdiff_associative (A B C : Set α) : (A ∆ B) ∆ C = A ∆ (B ∆ C
         constructor
         · -- goal: x∉B
           have h2rrc : x∉A → x∉B := by
-            simp_all
+            intro ha2 hb
+            exact ha (h2rr hb)
           exact h2rrc ha
         · exact ha
   · -- Goal: A ∆ B ⊆ A ∆ B ∆ C
     intro x hx
-    rewrite [symmDiff] at hx
-    rewrite [symmDiff]
+    simp_all only [mem_diff, mem_union, sup_eq_union, symmDiff]
+    push Not at *
     rcases hx with h1 | h2
-    · simp_all only [mem_diff, mem_union, sup_eq_union, symmDiff, not_true, and_false, or_false,
-      true_and,]
-      push Not at *
+    · simp_all only [not_true, and_false, or_false,
+      true_and, true_imp_iff]
       by_cases h3: x ∈ B
       · right
         have h4: x ∈ C := h1.2.1 h3
-        exact And.intro h4 h3
+        refine ⟨?_, ?_, ?_⟩ 
+        · exact h4
+        · exact h3
+        · intro h33
+          trivial
       · -- neg
         left
         have h4: x ∈ C → x ∈ B := h1.2.2
@@ -105,8 +109,8 @@ theorem symmdiff_associative (A B C : Set α) : (A ∆ B) ∆ C = A ∆ (B ∆ C
         have h5: x ∉ B → x ∉ C := by
           simp_all
         exact And.intro h3 (h5 h3)
-    · simp_all only [symmDiff, mem_diff, sup_eq_union, mem_union,
-      false_and, not_false_eq_true,and_true, false_or]
+    · simp_all only [false_and, not_false_eq_true,and_true, false_or, IsEmpty.forall_iff, imp_false,
+      true_and]
 
 -- (c): A∆A = ∅, A∆∅ = A
 theorem symmdiff_empty (A : Set α) : A ∆ A = ∅ := by  
