@@ -68,15 +68,14 @@ theorem symmdiff_associative (A B C : Set α) : (A ∆ B) ∆ C = A ∆ (B ∆ C
       -- h1: x ∈ (A \ B ⊔ B \ A) \ C
       -- Goal: x ∈ A \ (B \ C ⊔ C \ B)
       rewrite [mem_diff] at h1
-      simp_all
-    · simp_all
-      rewrite [symmDiff] at h2
-      rewrite [symmDiff]
-      simp_all
-      -- h2: x ∈ C ∧ (x ∈ A → x ∈ B) ∧ (x ∈ B → x ∈ A)
+      simp_all only [sup_eq_union, mem_union, mem_diff, not_false_eq_true,
+      and_true, false_and, or_false]
+    · simp_all only 
+      [symmDiff, mem_diff, sup_eq_union,mem_union,
+      not_true_eq_false, and_false, false_or, true_and]
+      push Not at *
       have h2rl : (x ∈ A → x ∈ B) := h2.right.left
       have h2rr : (x ∈ B → x ∈ A) := h2.right.right
-      simp_all
       by_cases ha: x ∈ A
       · left
         exact And.intro ha (h2rl ha)
@@ -92,9 +91,9 @@ theorem symmdiff_associative (A B C : Set α) : (A ∆ B) ∆ C = A ∆ (B ∆ C
     rewrite [symmDiff] at hx
     rewrite [symmDiff]
     rcases hx with h1 | h2
-    · rewrite [symmDiff] at h1
-      rewrite [symmDiff]
-      simp_all
+    · simp_all only [mem_diff, mem_union, sup_eq_union, symmDiff, not_true, and_false, or_false,
+      true_and,]
+      push Not at *
       by_cases h3: x ∈ B
       · right
         have h4: x ∈ C := h1.2.1 h3
@@ -106,13 +105,11 @@ theorem symmdiff_associative (A B C : Set α) : (A ∆ B) ∆ C = A ∆ (B ∆ C
         have h5: x ∉ B → x ∉ C := by
           simp_all
         exact And.intro h3 (h5 h3)
-    · rewrite [symmDiff] at h2
-      rewrite [symmDiff]
-      simp_all
-
+    · simp_all only [symmDiff, mem_diff, sup_eq_union, mem_union,
+      false_and, not_false_eq_true,and_true, false_or]
 
 -- (c): A∆A = ∅, A∆∅ = A
-theorem symmdiff_empty (A: Set α) : A ∆ A = ∅ := by
+theorem symmdiff_empty (A : Set α) : A ∆ A = ∅ := by  
   -- 集合の等式を ⊆ と ⊇ にわけて示す
   apply Subset.antisymm
   · -- Goal: A ∆ A ⊆ ∅
@@ -137,7 +134,7 @@ theorem symmdiff_empty (A: Set α) : A ∆ A = ∅ := by
     rewrite [diff_self]
     exact hx
 
-theorem symmdiff_empty2 (A: Set α) : A ∆ ∅ = A := by
+theorem symmdiff_empty2 (A : Set α) : A ∆ ∅ = A := by
   -- 集合の等式を ⊆ と ⊇ にわけて示す
   apply Subset.antisymm
   · -- Goal: A ∆ ∅ ⊆ A
