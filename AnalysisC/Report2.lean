@@ -1,6 +1,7 @@
 import Mathlib.Order.SymmDiff
 import Mathlib.Data.Set.Basic
 import Mathlib.Data.Set.Countable
+import Mathlib.MeasureTheory.Measure.Dirac
 
 variable {α : Type}
 
@@ -24,7 +25,7 @@ A∆B = (A \ B) ∪ (B \ A)
 open Set
 open scoped symmDiff
 
-section report2
+section report2prob1
 variable {A B : Set α}
 
 /-- (a) symmetric difference is commutative. -/
@@ -330,4 +331,43 @@ theorem symmdiff_Union_subset {ι : Type*} (A B : ι → Set α) :
     -- Goal: ∃ i, x ∈ A i ∆ B i
     exact ⟨i, h3⟩
 
-end report2
+end report2prob1
+section report2prob2
+
+open MeasureTheory
+open scoped ENNReal
+
+variable {S : Type*} [MeasurableSpace S]
+/-
+問2 以下の問に答えなさい。
+(1) (S, F)を可測空間とする。 ω ∈ Sを固定する。 F上の関数 ε_ω を 
+
+ε_ω(A) = 1(w∈A), 0 (w ∉ A) と定める。
+ε_ωはF上の測度であることを示しなさい。
+-/
+
+noncomputable def epsilon (ω : S) : Measure S := by
+  classical
+  refine Measure.ofMeasurable ?m ?m_empty ?m_iUnion
+  · intro A _hA
+    exact if ω ∈ A then 1 else 0
+  · simp
+  · intro f h1 h2 
+    simp only [mem_iUnion]
+    by_cases h_iexists : ∃ i, ω ∈ f i 
+    case pos =>
+      simp_all only [↓reduceIte]
+      obtain ⟨j, hj⟩ := h_iexists 
+      -- ⊢ 1 = Σ' (i : ℕ), if ω ∈ f i then 1 else 0
+      have h_not_i_impl_0 : ∀ (k : ℕ), k ≠ j → ω ∉ f k := by
+        intro k hk hfk
+        exact Set.disjoint_left.mp (h2 hk) hfk hj
+      rw [tsum_eq_single j]
+      · simp [hj]
+      · intro b hb
+        simp [h_not_i_impl_0 b hb]
+    case neg =>
+      push Not at h_iexists
+      simp_all only [exists_const, ↓reduceIte, tsum_zero]
+
+end report2prob2
