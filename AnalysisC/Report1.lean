@@ -182,7 +182,7 @@ lemma iUnion_in_F : ∀ f : ℕ → Set α,
       -- A ⊆ B, B.Countable → A.Countable
       -- 名前がわかりづらすぎる。monoってなに？？？？
       exact Set.Countable.mono h1 hi
-    grind
+    exact ⟨n, Or.resolve_left (h_all_i n) hn⟩
 
 -- 可測空間の型クラスのインスタンスを作る(これで(1)が解けたということになる)
 instance f_measurable_space : MeasurableSpace α where
