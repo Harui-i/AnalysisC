@@ -57,8 +57,7 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
     apply MeasurableSet.compl
     exact hω
   have h3 : (dira ω) omega_compl = 0 := by
-    simp [MeasureTheory.dirac_eq_zero_iff_not_mem h2]
-    simp [omega_compl]
+    simp [MeasureTheory.dirac_eq_zero_iff_not_mem h2, omega_compl]
   by_cases h_s_contains_omega : ω ∈ s
   case pos =>
     -- h_s_contains_omega : ω ∈ s
