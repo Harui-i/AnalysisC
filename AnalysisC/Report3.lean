@@ -39,8 +39,34 @@ https://leanprover-community.github.io/mathlib4_docs/Mathlib/MeasureTheory/Measu
 
 variable {α : Type*} (ω : α) [MeasurableSpace α]
 
+-- MeasureTheory.Measure.dirac ω を打ち続けるのはダルいので。ここでdefとすると微妙
+noncomputable abbrev dira (ω : α) : MeasureTheory.Measure α := MeasureTheory.Measure.dirac ω
+
 -- TODO: 結論の定式化
-theorem problem1_1 
-  (h_dirac_complete : MeasureTheory.Measure.IsComplete (MeasureTheory.Measure.dirac ω)) 
-  (hω : MeasurableSet ({ω} : Set α))
-  : 1 = 1 := by rfl
+theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω)) (hω : 
+    MeasurableSet ({ω} : Set α))
+  : ∀ (s : Set α), MeasurableSet s := by 
+  intro s 
+  -- ⊢ MeasurableSet s
+  simp only [MeasureTheory.Measure.isComplete_iff] at h_dirac_complete
+  -- h_dirac_complete : ∀ (s : Set α), (MeasureTheory.Measure.dirac ω) s = 0 → MeasurableSet s
+  -- つまり (t : Set α)であって ω ∉ t → MeasurableSet t
+  -- じゃあωを含むかどうかで場合分けすればいいんだ
+  by_cases h_s_contains_omega : ω ∈ s
+  case pos =>
+    -- h_s_contains_omega : ω ∈ s
+    sorry
+  case neg =>
+    -- h_s_contains_omega : ω ∉ s
+    apply h_dirac_complete s
+    -- ⊢ (MeasureTheory.Measure.dirac ω) s = 0
+    have h1 : (dira ω) s = 0 ∨ (dira ω) s = 1:= MeasureTheory.Measure.dirac_apply_eq_zero_or_one
+    rcases h1 with h1_0  | h1_1
+    · exact h1_0
+    ·
+      -- h1_1 : (dira ω) s = 1
+      -- h_ss_contains_omega : w ∉ s
+      -- ⊢ (dira ω) s = 0
+
+      sorry
+
