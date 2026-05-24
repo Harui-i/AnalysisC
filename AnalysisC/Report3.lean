@@ -42,9 +42,8 @@ variable {α : Type*} (ω : α) [MeasurableSpace α]
 -- MeasureTheory.Measure.dirac ω を打ち続けるのはダルいので。ここでdefとすると微妙
 noncomputable abbrev dira (ω : α) : MeasureTheory.Measure α := MeasureTheory.Measure.dirac ω
 
--- TODO: 結論の定式化
-theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω)) 
-  (hω : MeasurableSet ({ω} : Set α))
+theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω)) (hω :
+    MeasurableSet ({ω} : Set α))
   : ∀ (s : Set α), MeasurableSet s := by 
   intro s 
   -- ⊢ MeasurableSet s
@@ -66,7 +65,19 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
       -- s = {ω} ⊔ (S ∩  {ω}ᶜ)
       -- みたいに表せば右側がμ-0集合。完備だからこれは可測。
       have hs : s = {ω} ∪ (s ∩ omega_compl) := by
-        grind
+        ext x
+        constructor
+        · intro hx
+          by_cases hxω : x = ω
+          · left
+            exact hxω
+          · right
+            exact ⟨hx, by simpa [omega_compl] using hxω⟩
+        · intro hx
+          rcases hx with hx | hx
+          · rw [Set.mem_singleton_iff.mp hx]
+            exact h_s_contains_omega
+          · exact hx.1
       
       rw [hs]
       apply MeasurableSet.union 
@@ -76,7 +87,8 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
         -- ⊢ (dira ω) (s ∩ omega_compl) = 0
         --
         have h1 : s ∩ omega_compl ⊆ omega_compl := by
-          grind
+          intro x hx
+          exact hx.2
         have h2 : MeasurableSet omega_compl := by
           simp only [omega_compl]
           apply MeasurableSet.compl
@@ -115,4 +127,3 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
         exact h_s_contains_omega hx
       -- 測度の単調性
       apply MeasureTheory.Measure.mono_null h4 h3
-
