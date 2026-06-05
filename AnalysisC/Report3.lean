@@ -103,3 +103,19 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
       exact h_s_contains_omega hx
     -- 測度の単調性
     apply MeasureTheory.Measure.mono_null h4 h3
+-- (2) 測度空間 (Ω, A, εω) の完備化を求めなさい．
+-- TODO: implement
+theorem problem1_2 : 1+1 = 2 := by rfl
+
+/-問2. (S, F) を可測空間とし，f を S 上の関数とし，D を R の稠密な部分集合とする．
+以下の小問に答えなさい．
+
+(1) すべての a ∈ D に対し {f < a} ∈ F が成り立つならば，
+f は F-可測であることを示しなさい．
+
+(2) すべての a ∈ D に対し {f ≤ a} ∈ F が成り立つならば，
+f は F-可測であることを示しなさい．
+-/
+
+theorem problem2_1 : 1 + 1 = 2 := by rfl
+theorem problem2_2 : 1 + 1 = 2 := by rfl
