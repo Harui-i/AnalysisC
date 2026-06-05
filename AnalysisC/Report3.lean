@@ -104,8 +104,14 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
     -- 測度の単調性
     apply MeasureTheory.Measure.mono_null h4 h3
 -- (2) 測度空間 (Ω, A, εω) の完備化を求めなさい．
--- TODO: implement
-theorem problem1_2 : 1+1 = 2 := by rfl
+-- まず完備化ってどこにあるねん
+-- completion?
+--noncomputable abbrev dira (ω : α) : MeasureTheory.Measure α := MeasureTheory.Measure.dirac ω
+noncomputable abbrev dira_completion (ω : α) : MeasureTheory.Measure (
+  MeasureTheory.NullMeasurableSpace α (dira ω))
+  := MeasureTheory.Measure.completion (dira ω)
+theorem problem1_2 (ω : α ): dira ω = dira_completion ω  := by 
+  sorry
 
 /-問2. (S, F) を可測空間とし，f を S 上の関数とし，D を R の稠密な部分集合とする．
 以下の小問に答えなさい．
