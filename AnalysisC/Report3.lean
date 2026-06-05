@@ -105,7 +105,8 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
     apply MeasureTheory.Measure.mono_null h4 h3
 -- (2) 測度空間 (Ω, A, εω) の完備化を求めなさい．
 -- まず完備化ってどこにあるねん
--- completion?
+-- -> MeasureTheory.Measure.completionにあるけど、それを使ったからといっても完備化を求めたという感じはしない
+-- explicitに求めて、それがMeasureTheory.Measure.IsCompleteであることを示せばいいか
 --noncomputable abbrev dira (ω : α) : MeasureTheory.Measure α := MeasureTheory.Measure.dirac ω
 noncomputable abbrev dira_completion (ω : α) : MeasureTheory.Measure (
   MeasureTheory.NullMeasurableSpace α (dira ω))
