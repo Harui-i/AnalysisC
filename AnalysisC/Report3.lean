@@ -111,8 +111,8 @@ theorem problem1_1 (h_dirac_complete : MeasureTheory.Measure.IsComplete (dira ω
 noncomputable abbrev dira_completion (ω : α) : MeasureTheory.Measure (
   MeasureTheory.NullMeasurableSpace α (dira ω))
   := MeasureTheory.Measure.completion (dira ω)
-theorem problem1_2 (ω : α ): dira ω = dira_completion ω  := by 
-  sorry
+-- theorem problem0_2 (ω : α ): dira ω = dira_completion ω  := by 
+-- sorry
 
 /-問2. (S, F) を可測空間とし，f を S 上の関数とし，D を R の稠密な部分集合とする．
 以下の小問に答えなさい．
