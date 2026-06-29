@@ -1,7 +1,7 @@
 name = "AnalysisC"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["AnalysisC"]
+defaultTargets = ["AnalysisC", "report"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -15,5 +15,14 @@ name = "mathlib"
 scope = "leanprover-community"
 rev = "v4.29.0"
 
+[[require]]
+name = "verso"
+git = "https://github.com/leanprover/verso"
+rev = "v4.29.0"
+
 [[lean_lib]]
 name = "AnalysisC"
+
+[[lean_exe]]
+name = "report"
+root = "Main"
