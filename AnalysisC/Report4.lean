@@ -43,6 +43,14 @@ noncomputable def problem_1_1_rhs (α : ENNReal) (f_abs : β → ENNReal) (μ : 
 noncomputable def problem_1_1_lhs (α : ENNReal) (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
 := μ { x | α < (f_abs x) }
 
+
+-- Mathlibの定義にはENNReal(拡張された非負実数)値関数に関するLebesgue積分の定義があったので、それを使う
 theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
+(hf : Measurable f_abs)
 : (problem_1_1_lhs msp α f_abs μ)  < problem_1_1_rhs msp α f_abs μ := by
+    simp [problem_1_1_lhs, problem_1_1_rhs]
+
+    -- fをF-可測関数とする、の情報を使ってなくね
+
+
     sorry
