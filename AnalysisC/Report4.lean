@@ -18,4 +18,9 @@ lim_{n→∞} ∫_S f_n(x) dμ(x) = ∫_S lim_{n→∞} f_n(x) dμ(x) が成り�
 
 (1) Lebesgueの優収束定理を使う
 (2) Egoroffの定理を用いる
+
+問3 (S,F,μ)を測度空間とし, {f_n}_{n=1}^∞ をF-可測関数の列とする。あるS上のμ-可積分関数gが存在して、すべてのn∈ℕとx∈S
+に対し|f_n(x)| ≤ g(x)が成り立つとする。このとき liminf_{n→ ∞} f_n と limsup_{n→∞}はS上のμ-可積分関数であり、
+∫_S liminf_{n→∞} f_n dμ ≤ liminf_{n→∞} ∫_S f_n dμ ≤ limsup_{n→∞} ∫_S f_n dμ ≤ ∫_S limsup_{n→∞} f_n dμ
+を満たすことを示せ
 -/
