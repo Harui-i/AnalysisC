@@ -68,21 +68,22 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
           ENNReal.inv_top, zero_mul, Std.le_refl]
     case neg =>
         -- hα_top: ¬ α = ⊤
-        simp [← ENNReal.mul_le_iff_le_inv hα2 hα_top]
-
+        simp only [one_div, ge_iff_le]
         -- ⊢ α * μ {x | α < f_abs x} ≤   ∫⁻ (x: β), f_abs x ∂μ
+        let s : Set β := {x | α < f_abs x}
+        have hs : MeasurableSet s := by
+            -- TODO: hf: Measurable f_absを使って示す
+            sorry
+        rw [← MeasureTheory.lintegral_indicator_one hs]
+        -- ⊢ ∫⁻ (a : β), s.indicator 1 a ∂μ ≤ α⁻¹ * ∫⁻ (x : β) f_abs x ∂μ
 
-        -- μ {x | α < f_abs x} ≤ ∫⁻ (x : β), 1_{x | α < f_abs x} x ∂μの評価をしたい
-        -- つまり μ(s) = ∫ 1_s(x) みたいな置換をしたい
-
-        -- 指示関数ははindicator functionらしい
-        -- indicator functionはどうやって定義されてるんだ
-        -- Mathlib.MeasureTheory.Integral.Indicator:
-        -- https://leanprover-community.github.io/mathlib4_docs/Mathlib/MeasureTheory/Integral/Indicator.html
+        calc
+            _ = ∫⁻ (a : β), s.indicator 1 a ∂μ := by rfl
+            _ ≤ ∫⁻ (a : β) in s, (fun x ↦ 1) a ∂μ :=
+                MeasureTheory.lintegral_indicator_le (fun x ↦ 1) s
+        -- ⊢ ∫⁻ (a : β) in s, (fun x ↦ 1) a ∂μ ≤ α⁻¹ * ∫⁻ (x : β), f_abs x ∂μ
+        -- これ積分の範囲を揃えて後はたぶん各点ごとの関数比較にもっていけばいい
 
         -- rg "lintegral_indicator" ./lake/packages/mathlibをしたり、
         -- VSCode上でfiles to includeして*.ileanをexcludeしたうえで検索してるといい感じのを見つけやすいかも
-        -- ↓こんな感じの定理とかを使うといい？ とはいえ今回の場合Setはでてこないんだよな
-        -- theorem lintegral_indicator_le (f : α → ℝ≥0∞) (s : Set α) :
-        -- ∫⁻ a, s.indicator f a ∂μ ≤ ∫⁻ a in s, f a ∂μ := by
         sorry
