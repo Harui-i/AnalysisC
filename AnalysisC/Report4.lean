@@ -49,41 +49,52 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
 (hf : Measurable f_abs)
 : problem_1_1_lhs msp α f_abs μ  ≤ problem_1_1_rhs msp α f_abs μ := by
 
-    simp only [problem_1_1_lhs, problem_1_1_rhs]
-    -- ⊢ μ {x | α < f_abs x} ≤ α⁻¹ * ∫⁻ (x: β), f_abs x ∂μ
-    -- 両辺αかける
+  simp only [problem_1_1_lhs, problem_1_1_rhs]
+  -- ⊢ μ {x | α < f_abs x} ≤ α⁻¹ * ∫⁻ (x: β), f_abs x ∂μ
+  -- 両辺αかける
 
-    have hα2 : α ≠ 0 := by
-        simp_all only [gt_iff_lt, ne_eq]
-        intro h
-        rw [h] at hα
-        -- hα : 0 < 0
-        simp_all only [lt_self_iff_false]
+  have hα2 : α ≠ 0 := by
+    simp_all only [gt_iff_lt, ne_eq]
+    intro h
+    rw [h] at hα
+    -- hα : 0 < 0
+    simp_all only [lt_self_iff_false]
 
-    -- αがtopがどうかで場合分け
-    by_cases hα_top : α = ⊤
+  -- αがtopがどうかで場合分け
+  by_cases hα_top : α = ⊤
+  case pos =>
+    simp_all only [gt_iff_lt, ENNReal.zero_lt_top, ne_eq, ENNReal.top_ne_zero,
+      not_false_eq_true, not_top_lt, Set.setOf_false, MeasureTheory.measure_empty, one_div,
+      ENNReal.inv_top, zero_mul, Std.le_refl]
+  case neg =>
+    -- hα_top: ¬ α = ⊤
+
+    simp only [one_div, ge_iff_le]
+    simp only [← ENNReal.mul_le_iff_le_inv hα2 hα_top]
+    -- ⊢ α * μ {x | α < f_abs x} ≤   ∫⁻ (x: β), f_abs x ∂μ
+    let s : Set β := {x | α < f_abs x}
+    have hs : MeasurableSet s := by
+      -- TODO: hf: Measurable f_absを使って示す
+      sorry
+    
+    --　左辺のαを中に入れたい
+    rw [← MeasureTheory.setLIntegral_const s α]
+    -- ⊢ ∫⁻ (x : β) in s, α ∂μ ≤ ...
+    rw [← MeasureTheory.lintegral_indicator hs ]
+    -- ⊢ ∫⁻ (a : β) s.indicator (fun x ↦ α) a ∂μ ≤ ∫⁻ (x : β), f_abs x ∂μ
+    -- あとは各点での評価におちるはず
+    apply MeasureTheory.lintegral_mono
+    -- ⊢ (s.indicator fun x↦α) ≤ f_abs
+    intro x
+    simp only [s]
+
+    by_cases hf : α < f_abs x
     case pos =>
-        simp_all only [gt_iff_lt, ENNReal.zero_lt_top, ne_eq, ENNReal.top_ne_zero,
-          not_false_eq_true, not_top_lt, Set.setOf_false, MeasureTheory.measure_empty, one_div,
-          ENNReal.inv_top, zero_mul, Std.le_refl]
+      simp [hf]
+      -- hf: α < f_abs x
+      -- ⊢ α ≤ f_abs x
+      grind
     case neg =>
-        -- hα_top: ¬ α = ⊤
-        simp only [one_div, ge_iff_le]
-        -- ⊢ α * μ {x | α < f_abs x} ≤   ∫⁻ (x: β), f_abs x ∂μ
-        let s : Set β := {x | α < f_abs x}
-        have hs : MeasurableSet s := by
-            -- TODO: hf: Measurable f_absを使って示す
-            sorry
-        rw [← MeasureTheory.lintegral_indicator_one hs]
-        -- ⊢ ∫⁻ (a : β), s.indicator 1 a ∂μ ≤ α⁻¹ * ∫⁻ (x : β) f_abs x ∂μ
-
-        calc
-            _ = ∫⁻ (a : β), s.indicator 1 a ∂μ := by rfl
-            _ ≤ ∫⁻ (a : β) in s, (fun x ↦ 1) a ∂μ :=
-                MeasureTheory.lintegral_indicator_le (fun x ↦ 1) s
-        -- ⊢ ∫⁻ (a : β) in s, (fun x ↦ 1) a ∂μ ≤ α⁻¹ * ∫⁻ (x : β), f_abs x ∂μ
-        -- これ積分の範囲を揃えて後はたぶん各点ごとの関数比較にもっていけばいい
-
-        -- rg "lintegral_indicator" ./lake/packages/mathlibをしたり、
-        -- VSCode上でfiles to includeして*.ileanをexcludeしたうえで検索してるといい感じのを見つけやすいかも
-        sorry
+      push Not at hf
+      -- hf : f_abs x ≤ α 
+      simp [hf]
