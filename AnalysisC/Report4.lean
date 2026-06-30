@@ -68,13 +68,13 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
       ENNReal.inv_top, zero_mul, Std.le_refl]
   case neg =>
     -- hα_top: ¬ α = ⊤
-
     simp only [one_div, ge_iff_le]
     simp only [← ENNReal.mul_le_iff_le_inv hα2 hα_top]
     -- ⊢ α * μ {x | α < f_abs x} ≤   ∫⁻ (x: β), f_abs x ∂μ
     let s : Set β := {x | α < f_abs x}
     have hs : MeasurableSet s := by
       -- TODO: hf: Measurable f_absを使って示す
+      -- これ可測集合なのは授業だと定義なんだよな
       sorry
     
     --　左辺のαを中に入れたい
@@ -90,10 +90,10 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
 
     by_cases hf : α < f_abs x
     case pos =>
-      simp [hf]
+      simp only [Set.mem_setOf_eq, hf, Set.indicator_of_mem]
       -- hf: α < f_abs x
       -- ⊢ α ≤ f_abs x
-      grind
+      exact le_of_lt hf
     case neg =>
       push Not at hf
       -- hf : f_abs x ≤ α 
