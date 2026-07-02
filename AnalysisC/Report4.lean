@@ -1,5 +1,6 @@
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.MeasureTheory.Integral.Lebesgue.Basic
+import Mathlib.Order.Interval.Set.Defs
 
 /-
 次の問1, 問2, および問3 を解き、レポートとして7/14に提出
@@ -48,18 +49,15 @@ noncomputable def problem_1_1_lhs (α : ENNReal) (f_abs : β → ENNReal) (μ : 
 theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
 (hf : Measurable f_abs)
 : problem_1_1_lhs msp α f_abs μ  ≤ problem_1_1_rhs msp α f_abs μ := by
-
   simp only [problem_1_1_lhs, problem_1_1_rhs]
   -- ⊢ μ {x | α < f_abs x} ≤ α⁻¹ * ∫⁻ (x: β), f_abs x ∂μ
   -- 両辺αかける
-
   have hα2 : α ≠ 0 := by
     simp_all only [gt_iff_lt, ne_eq]
     intro h
     rw [h] at hα
     -- hα : 0 < 0
     simp_all only [lt_self_iff_false]
-
   -- αがtopがどうかで場合分け
   by_cases hα_top : α = ⊤
   case pos =>
@@ -73,10 +71,8 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
     -- ⊢ α * μ {x | α < f_abs x} ≤   ∫⁻ (x: β), f_abs x ∂μ
     let s : Set β := {x | α < f_abs x}
     have hs : MeasurableSet s := by
-      -- TODO: hf: Measurable f_absを使って示す
-      -- これ可測集合なのは授業だと定義なんだよな
-      sorry
-    
+      -- https://leanprover-community.github.io/mathlib4_docs/Mathlib/MeasureTheory/Constructions/BorelSpace/Order.html#Borel-sigma-algebras-on-spaces-with-orders
+      exact hf measurableSet_Ioi
     --　左辺のαを中に入れたい
     rw [← MeasureTheory.setLIntegral_const s α]
     -- ⊢ ∫⁻ (x : β) in s, α ∂μ ≤ ...
@@ -87,7 +83,6 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
     -- ⊢ (s.indicator fun x↦α) ≤ f_abs
     intro x
     simp only [s]
-
     by_cases hf : α < f_abs x
     case pos =>
       simp only [Set.mem_setOf_eq, hf, Set.indicator_of_mem]
