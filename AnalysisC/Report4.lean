@@ -93,3 +93,9 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
       push Not at hf
       -- hf : f_abs x ≤ α 
       simp [hf]
+
+-- (2) fが可積分なら |f| < ∞ a.e. であることを示しなさい
+theorem problem_1_2 (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
+(hf : Measurable f_abs) (hf_int : (∫⁻ x, f_abs x ∂μ) < ⊤)
+: ∀ᵐ x ∂μ, f_abs x < ⊤ := by
+  sorry
