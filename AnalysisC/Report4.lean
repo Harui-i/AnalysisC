@@ -1,7 +1,9 @@
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.MeasureTheory.Integral.Lebesgue.Basic
+import Mathlib.MeasureTheory.Integral.Lebesgue.Markov
 import Mathlib.Order.Interval.Set.Defs
 
+namespace Report4
 /-
 次の問1, 問2, および問3 を解き、レポートとして7/14に提出
 
@@ -91,11 +93,42 @@ theorem problem_1_1 (α : ENNReal) (hα : α > 0) (f_abs : β → ENNReal) (μ :
       exact le_of_lt hf
     case neg =>
       push Not at hf
-      -- hf : f_abs x ≤ α 
+      -- hf : f_abs x ≤ α
       simp [hf]
 
 -- (2) fが可積分なら |f| < ∞ a.e. であることを示しなさい
 theorem problem_1_2 (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
 (hf : Measurable f_abs) (hf_int : (∫⁻ x, f_abs x ∂μ) < ⊤)
+  -- f-abs: |f|は非負拡大実数値関数
+  -- μ : 測度
+  -- hf: |f| は可測関数
+  -- hf_int: |f| は可積分
 : ∀ᵐ x ∂μ, f_abs x < ⊤ := by
-  sorry
+  -- f_abs x < ⊤が μ-a.e.で成立することを示す
+  let E : Set β  := {x | f_abs x = ⊤}
+  simp only [MeasureTheory.ae_iff, not_lt, top_le_iff]
+  change μ E = 0
+  -- ⊢ μ E = 0
+  by_contra h_nonzero
+  -- h_nonzero ¬ μ E = 0
+  have h_muE : μ {x ∈ E | f_abs x = ⊤ } ≠ 0 := by
+    simpa [E]
+  have hf_top_in_E : ∫⁻ x in E, f_abs x ∂μ = ⊤ := by
+    apply MeasureTheory.setLIntegral_eq_top_of_measure_eq_top_ne_zero
+    · -- ⊢ AEMeasurable f_abs (μ.restrict E)
+      exact Measurable.aemeasurable hf
+    · -- μ 
+      -- μ {x | x ∈ E ∧ f_abs x = ⊤ } ≠ 0
+      exact h_muE
+  have hf_top1 : ∫⁻ x, f_abs x ∂μ ≥ ⊤ := by
+    calc 
+      _ ≥ ∫⁻ x in E, f_abs x ∂μ  := by simp [MeasureTheory.setLIntegral_le_lintegral]
+      _ = ⊤ := by simp [hf_top_in_E]
+  have hf_top : ∫⁻ x, f_abs x ∂μ = ⊤ := by
+    simp_all only [ge_iff_le, top_le_iff]
+  rw [hf_top] at hf_int
+  -- hf_int : ⊤ < ⊤ 
+  -- 矛盾
+  contradiction
+
+end Report4
