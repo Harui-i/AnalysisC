@@ -4,6 +4,7 @@ import Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.MeasureTheory.MeasurableSpace.Defs --可測空間の定義など
 import Mathlib.MeasureTheory.SetAlgebra --有限加法族
 
+namespace Reprot1
 open scoped MeasureTheory
 
 /--
@@ -538,3 +539,4 @@ theorem problem_2_3 (A : Set α) :
       apply MeasurableSpace.GenerateMeasurable.compl
       exact MeasurableSpace.GenerateMeasurable.empty
 end
+end Reprot1

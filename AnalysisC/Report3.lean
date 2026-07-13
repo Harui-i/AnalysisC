@@ -1,6 +1,7 @@
 import Mathlib.MeasureTheory.Measure.NullMeasurable
 import Mathlib.MeasureTheory.Measure.Dirac
 
+namespace Report3
 /-
 解析学Cレポート問題No.3
 
@@ -126,3 +127,4 @@ f は F-可測であることを示しなさい．
 
 theorem problem2_1 : 1 + 1 = 2 := by rfl
 theorem problem2_2 : 1 + 1 = 2 := by rfl
+end Report3
