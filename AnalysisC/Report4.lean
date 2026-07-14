@@ -104,6 +104,8 @@ theorem problem_1_2 (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
   -- hf: |f| は可測関数
   -- hf_int: |f| は可積分
 : ∀ᵐ x ∂μ, f_abs x < ⊤ := by
+  -- TODO: `setLIntegral_eq_top_of_measure_eq_top_ne_zero` が、値が ⊤ の集合上の
+  -- 積分が ⊤ になるという証明(だいぶ本質)を与えているので、時間がアレばここも自力で展開していきたい
   -- f_abs x < ⊤が μ-a.e.で成立することを示す
   let E : Set β  := {x | f_abs x = ⊤}
   simp only [MeasureTheory.ae_iff, not_lt, top_le_iff]
@@ -130,5 +132,16 @@ theorem problem_1_2 (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
   -- hf_int : ⊤ < ⊤ 
   -- 矛盾
   contradiction
+
+-- ∫_S |f| dμ = 0 ならば f = 0 a.e.であることを示しなさい
+theorem problem_1_3 (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
+  (hf : Measurable f_abs) (hf_int : (∫⁻ x, f_abs x ∂μ) = 0) : ∀ᵐ x ∂μ, f_abs x = 0 := by
+    -- TODO: lintegral_eq_zero_iff が、今回の結論とほぼ同じ一般定理を
+    -- 直接与えているので、さすがに展開したほうがいい
+    simp only [MeasureTheory.lintegral_eq_zero_iff hf] at hf_int
+    -- hf_int : f_abs =ᵐ[μ] 0
+    simp only [MeasureTheory.ae_iff]
+    exact MeasureTheory.aeEq_iff.mp hf_int
+
 
 end Report4
