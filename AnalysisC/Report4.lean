@@ -114,7 +114,7 @@ theorem problem_1_2 (f_abs : β → ENNReal) (μ : MeasureTheory.Measure β)
   by_contra h_nonzero
   -- h_nonzero ¬ μ E = 0
   have h_muE : μ {x ∈ E | f_abs x = ⊤ } ≠ 0 := by
-    simpa [E]
+    simp_all only [E, Set.mem_setOf_eq, and_self, ne_eq, not_false_eq_true]
   have hf_top_in_E : ∫⁻ x in E, f_abs x ∂μ = ⊤ := by
     apply MeasureTheory.setLIntegral_eq_top_of_measure_eq_top_ne_zero
     · -- ⊢ AEMeasurable f_abs (μ.restrict E)
